@@ -40,6 +40,7 @@ class ImageProjection : public ParamServer
 {
 private:
 
+    //上锁
     std::mutex imuLock; //imu锁
     std::mutex odoLock; //里程计锁
 
