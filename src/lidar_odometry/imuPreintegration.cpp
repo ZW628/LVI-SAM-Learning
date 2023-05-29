@@ -404,7 +404,7 @@ public:
 
     /**
      * 订阅imu原始数据
-     * 1、用上一帧激光里程计时刻对应的状态、偏置，施加从该时刻开始到当前时刻的imu预计分量，得到当前时刻的状态，也就是imu里程计
+     * 1、用上一帧激光里程计时刻对应的状态、偏置，施加从该时刻开始到当前时刻的imu预积分量，得到当前时刻的状态，也就是imu里程计
      * 2、imu里程计位姿转到lidar系，发布里程计
     */
     void imuHandler(const sensor_msgs::Imu::ConstPtr& imuMsg)

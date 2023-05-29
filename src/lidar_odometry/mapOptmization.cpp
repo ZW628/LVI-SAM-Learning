@@ -148,7 +148,7 @@ public:
         // 定义ISAM2参数类(ISAM2Params类)对象parameters
         ISAM2Params parameters;
         /** Only relinearize variables whose linear delta magnitude is greater than
-         *  this threshold (default: 0.1).
+         *  this threshold (default: 0.1). 仅重新线性化线性增量大于此阈值的变量
         **/
         // 重线性化阈值relinearizeThreshold = 0.1   
         parameters.relinearizeThreshold = 0.1;

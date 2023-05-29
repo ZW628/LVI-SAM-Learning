@@ -143,6 +143,7 @@ public:
     //析构函数
     ~ImageProjection(){}
 
+    //imu原始数据送入imuhandle，放入imuqueue中
     void imuHandler(const sensor_msgs::Imu::ConstPtr& imuMsg)
     {
         sensor_msgs::Imu thisImu = imuConverter(*imuMsg); //将imu的三个轴的线加速度和角加速度的信息旋转到以lidar为中心的坐标系
@@ -150,6 +151,7 @@ public:
         imuQueue.push_back(thisImu);
     }
 
+    //odometry/imu_incremental送入odomhandle，放入odomqueue中
     void odometryHandler(const nav_msgs::Odometry::ConstPtr& odometryMsg)
     {
         std::lock_guard<std::mutex> lock2(odoLock);
@@ -174,7 +176,7 @@ public:
         resetParameters();
     }
 
-    //队列里面的点云数量是否满足要求
+    //1 队列里面的点云数量是否满足要求
     bool cachePointCloud(const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg)
     {
         // cache point cloud
@@ -245,12 +247,14 @@ public:
         return true;
     }
 
+    //2 IMU去畸变、视觉里程计去畸变
     bool deskewInfo()
     {
         std::lock_guard<std::mutex> lock1(imuLock);
         std::lock_guard<std::mutex> lock2(odoLock);
 
         // make sure IMU data available for the scan
+        // 要求imu数据时间上包含激光数据，否则不往下处理了
         if (imuQueue.empty() || imuQueue.front().header.stamp.toSec() > timeScanCur || imuQueue.back().header.stamp.toSec() < timeScanNext)
         {
             ROS_DEBUG("Waiting for IMU data ...");
@@ -327,7 +331,7 @@ public:
 
         cloudInfo.imuAvailable = true;
     }
-    // 视觉里程计去畸变
+    // 2.2 视觉里程计去畸变
     void odomDeskewInfo()
     {
         cloudInfo.odomAvailable = false;
@@ -557,6 +561,7 @@ public:
         }
     }
     //点云RangeImage
+    //把特征依次装到一个一维数组中，然后发布到别的进程里处理
     void cloudExtraction()
     {
         int count = 0;
@@ -585,7 +590,7 @@ public:
             cloudInfo.endRingIndex[i] = count -1 - 5;//最末尾的五个不考虑
         }
     }
-
+    //把extractedCloud发布出去
     void publishClouds()
     {
         cloudInfo.header = cloudHeader; //点云的头部信息 包含时间戳、坐标系信息
