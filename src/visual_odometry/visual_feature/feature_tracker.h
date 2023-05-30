@@ -286,15 +286,18 @@ public:
                     s = min_depth;
                 }
                 // convert feature into cartesian space if depth is available
+                // 如果深度可用，将特征转换到笛卡尔空间
                 features_3d_sphere->points[i].x *= s;
                 features_3d_sphere->points[i].y *= s;
                 features_3d_sphere->points[i].z *= s;
                 // the obtained depth here is for unit sphere, VINS estimator needs depth for normalized feature (by value z), (lidar x = camera z)
+                // 此处获得的深度是单位球体的深度，VINS估计器需要归一化特征的深度(通过值z)，(激光雷达x = 相机z)
                 features_3d_sphere->points[i].intensity = features_3d_sphere->points[i].x;
             }
         }
 
         // visualize features in cartesian 3d space (including the feature without depth (default 1))
+        // 在笛卡尔3d空间中可视化特征(包括没有深度的特征(默认为1))
         publishCloud(&pub_depth_feature, features_3d_sphere, stamp_cur, "vins_body_ros");
         
         // update depth value for return
@@ -306,6 +309,7 @@ public:
         }
 
         // visualization project points on image for visualization (it's slow!)
+        // 可视化投影点在图像上进行可视化(很慢！)
         if (pub_depth_image.getNumSubscribers() != 0)
         {
             vector<cv::Point2f> points_2d;
